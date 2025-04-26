@@ -1,0 +1,88 @@
+#include <iostream>
+using namespace std;
+
+template<class T>
+class MyShared {
+    T* data_ptr = nullptr;
+    size_t* ref_count = nullptr;
+
+    void release() {
+        if (ref_count && --(*ref_count) == 0) {
+            delete data_ptr;
+            delete ref_count;
+        }
+    }
+
+public:
+    explicit MyShared(T* ptr) : data_ptr(ptr), ref_count(new size_t(1)) {}
+
+    MyShared(const MyShared& other) 
+        : data_ptr(other.data_ptr), ref_count(other.ref_count) {
+        ++(*ref_count);
+    }
+
+    MyShared& operator=(const MyShared& other) {
+        if (this != &other) {
+            release();
+            data_ptr = other.data_ptr;
+            ref_count = other.ref_count;
+            ++(*ref_count);
+        }
+        return *this;
+    }
+
+    ~MyShared() {
+        release();
+    }
+
+    T* get() const { 
+        return data_ptr; 
+    }
+
+    size_t use_count() const { 
+        return ref_count ? *ref_count : 0; 
+    }
+
+    T& operator*() { 
+        return *data_ptr; 
+    }
+
+    T* operator->() { 
+        return data_ptr; 
+    }
+};
+
+
+template<typename T, typename... Args>
+MyShared<T> Make_MyShared(Args... args) {
+    return MyShared<T>(new T(args...));
+}
+
+class Point {
+    int x, y;
+public:
+    Point(int x, int y) : x(x), y(y) {
+        cout << "Точка: (" << x << ", " << y << ")\n";
+    }
+
+    friend ostream& operator<<(ostream& os, const Point& p) {
+        os << "Координаты: [" << p.x << ", " << p.y << "]";
+        return os;
+    }
+
+    void show() const {
+        cout << "Текущие координаты: " << x << " " << y << "\n";
+    }
+};
+
+int main() {
+    MyShared<Point> ptr1 = Make_MyShared<Point>(10, 10);
+    ptr1->show();
+    MyShared<Point> ptr2 = ptr1;
+    cout << "Количество ссылок: " << ptr1.use_count() << "\n";
+    cout << "Адрес в памяти: " << ptr1.get() << "\n";
+    cout << "Данные ptr1: " << *ptr1 << "\n";
+    cout << "Данные ptr2: " << *ptr2 << "\n";
+
+    return 0;
+}
