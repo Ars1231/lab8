@@ -1,0 +1,69 @@
+#include <iostream>
+using namespace std;
+
+template<class T>
+class MyUnique {
+    T* raw_ptr = nullptr; 
+    MyUnique(const MyUnique&) = delete;
+    MyUnique& operator=(const MyUnique&) = delete;
+
+public:
+    explicit MyUnique(T* ptr) : raw_ptr(ptr) {}
+    ~MyUnique() {
+        delete raw_ptr;
+    }
+    
+    //конструктор перемещения
+    MyUnique(MyUnique&& other) noexcept : raw_ptr(other.raw_ptr) {
+        other.raw_ptr = nullptr;  //перенос
+    }
+    
+    // Перемещающее присваивание
+    MyUnique& operator=(MyUnique&& other) noexcept {
+        if (this != &other) {
+            delete raw_ptr;         //очистка даннх
+            raw_ptr = other.raw_ptr;
+            other.raw_ptr = nullptr;
+        }
+        return *this;
+    }
+    
+    // Доступ к данным
+    T* get() const { return raw_ptr; }
+    T& operator*()  { return *raw_ptr; }
+    T* operator->() { return raw_ptr; }
+};
+
+
+template<typename T, typename... Args>
+MyUnique<T> Make_MyUnique(Args... args) {
+    return MyUnique<T>(new T(args...));  //передача по значению
+}
+
+
+class Point {
+    int x, y;
+public:
+    Point(int coordx, int coory) 
+        : x(coordx), y(coordy) 
+    {
+        cout << "Создана точка: (" << x << ", " << y << ")\n";
+    }
+    
+    void display() const {
+        cout << "Координаты: [" << x << ", " << y << "]\n";
+    }
+};
+
+int main() {
+    MyUnique<Point> point_ptr = Make_MyUnique<Point>(5, 7);
+    point_ptr->display();
+
+    MyUnique<Point> moved_ptr = std::move(point_ptr);
+    if (!point_ptr.get()) {
+        cout << "Объект успешно перемещён\n";
+    }
+    (*moved_ptr).display();
+
+    return 0;
+}
