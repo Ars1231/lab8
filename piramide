@@ -24,7 +24,6 @@ void heap_sort(It first, It last, Compare cmp = Compare{}) {
     if (size <= 1) return;
     for (It i = first + size / 2 - 1; i >= first; --i)
         heap(first, last, i, cmp);
-
     for (It i = last - 1; i > first; --i) {
         auto temp = *first;
         *first = *i;
