@@ -1,0 +1,45 @@
+#include <iostream>
+#include <iterator>
+#include <vector>
+using namespace std;
+
+template <class It, class Compare = less<>>
+void inplace(It first, It mid, It last, Compare cmp = Compare{}) {
+    if (first == mid || mid == last) return;
+    It left = first;
+    It right = mid;
+    while (left != right && right != last) {
+        if (cmp(*right, *left)) {
+            auto temp = move(*right);
+            It current = right;
+            while (current != left) {
+                *current = move(*(current - 1));
+                --current;
+            }
+            *left = move(temp);
+            ++mid;
+            ++right;
+        }
+        ++left;
+    }
+}
+
+template <class It, class Compare = less<>>
+void sort(It first, It last, Compare cmp = Compare{}) {
+    auto size = distance(first, last);
+    if (size <= 1) return;
+    It mid = first;
+    advance(mid, size / 2);
+    sort(first, mid, cmp);
+    sort(mid, last, cmp);
+    inplace(first, mid, last, cmp);
+}
+
+int main() {
+    vector<int> x = {10,5,8,1,4,3,7,6};
+    sort(x.begin(), x.end());
+    for (int i : x) {
+        cout << i << " ";
+        }
+    return 0;
+}
