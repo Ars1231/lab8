@@ -1,0 +1,44 @@
+#include <iostream>
+using namespace std;
+
+template<class It, class Compare>
+void heap(It first, It last, It root, Compare cmp) {
+    It largest = root;
+    It left = first + (root - first) * 2 + 1;
+    It right = first + (root - first) * 2 + 2;
+    if (left < last && cmp(*largest, *left))
+        largest = left;
+    if (right < last && cmp(*largest, *right))
+        largest = right;
+    if (largest != root) {
+        auto temp = *root;
+        *root = *largest;
+        *largest = temp;
+        heapify(first, last, largest, cmp);
+    }
+}
+
+template<class It, class Compare = std::less<>>
+void heap_sort(It first, It last, Compare cmp = Compare{}) {
+    auto size = last - first;
+    if (size <= 1) return;
+    for (It i = first + size / 2 - 1; i >= first; --i)
+        heap(first, last, i, cmp);
+
+    for (It i = last - 1; i > first; --i) {
+        auto temp = *first;
+        *first = *i;
+        *i = temp;
+        heap(first, i, first, cmp);
+    }
+}
+
+int main() {
+    int arr[] = {10, 5,8,1,4,3,7,6};
+    int size = sizeof(arr)/sizeof(arr[0]);
+    heap_sort(arr, arr + size);
+    for (int i = 0; i < size; i++)
+        cout << arr[i] << " ";
+    
+    return 0;
+}
