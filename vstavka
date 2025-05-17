@@ -1,0 +1,29 @@
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
+template <class It, class Compare = std::less<>>
+void insertion_sort(It first, It last, Compare cmp = Compare{}) {
+    if (first == last) return;
+    for (It i = first + 1; i != last; ++i) {
+        auto key = move(*i);
+        It j = i;
+        while (j > first && cmp(key, *(j - 1))) {
+            *j = move(*(j - 1));
+            --j;
+        }
+        *j = move(key);
+    }
+}
+
+
+int main() {
+    vector<int> x = { 10,5,8,1,4,3,7,6 };
+    insertion_sort(x.begin(), x.end());
+    for (int i : x) {
+        cout << i << " ";
+    }
+    
+    return 0;
+}
