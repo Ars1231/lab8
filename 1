@@ -37,9 +37,11 @@ void sort(It first, It last, Compare cmp = Compare{}) {
 
 int main() {
     vector<int> x = {10,5,8,1,4,3,7,6};
-    sort(x.begin(), x.end());
+    int num;
+    quick_sort(x.begin(), x.end());
     for (int i : x) {
         cout << i << " ";
-        }
+    }
+    
     return 0;
 }
