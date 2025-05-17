@@ -14,7 +14,7 @@ void heap(It first, It last, It root, Compare cmp) {
         auto temp = *root;
         *root = *largest;
         *largest = temp;
-        heapify(first, last, largest, cmp);
+        heap(first, last, largest, cmp);
     }
 }
 
