@@ -33,11 +33,12 @@ void heap_sort(It first, It last, Compare cmp = Compare{}) {
 }
 
 int main() {
-    int arr[] = {10, 5,8,1,4,3,7,6};
-    int size = sizeof(arr)/sizeof(arr[0]);
-    heap_sort(arr, arr + size);
-    for (int i = 0; i < size; i++)
-        cout << arr[i] << " ";
+    vector<int> x = {10,5,8,1,4,3,7,6};
+    int num;
+    quick_sort(x.begin(), x.end());
+    for (int i : x) {
+        cout << i << " ";
+    }
     
     return 0;
 }
